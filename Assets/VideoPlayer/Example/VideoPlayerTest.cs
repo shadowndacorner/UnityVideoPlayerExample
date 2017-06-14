@@ -8,24 +8,43 @@ public class VideoPlayerTest : MonoBehaviour {
     public RenderTexture MovieTexture;
     public RenderTextureToImage UI_Image;
 
-    void Start () {
+    IEnumerator Start () {
         var player = GetComponent<VideoPlayer>();
+        var audioSource = gameObject.GetComponent<AudioSource>();
+
         if (!player)
             player = gameObject.AddComponent<VideoPlayer>();
-        
-        MovieTexture = new RenderTexture(1280, 720, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
-        if (UI_Image)
-        {
-            UI_Image.Texture = MovieTexture;
-        }
+        if (!audioSource)
+            audioSource = gameObject.AddComponent<AudioSource>();
 
+        MovieTexture = new RenderTexture(1280, 720, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Default);
 
-		player.url = URL;
         player.renderMode = VideoRenderMode.RenderTexture;
         player.targetTexture = MovieTexture;
-        player.Play();
 
-        GetComponent<MeshRenderer>().material.mainTexture = MovieTexture;
+        player.SetTargetAudioSource(0, audioSource);
+        player.audioOutputMode = VideoAudioOutputMode.AudioSource;
+        player.EnableAudioTrack(0, true);
+
+		player.url = URL;
+        player.Prepare();
+
+        while (!player.isPrepared)
+            yield return null;
+        
+		if (UI_Image)
+			UI_Image.Texture = MovieTexture;
+        
+		GetComponent<MeshRenderer>().material.mainTexture = MovieTexture;
+
+        player.Play();
+        audioSource.Play();
+
+        while (player.isPlaying)
+        {
+            yield return null;
+        }
+
+        Debug.Log("Playback complete");
 	}
-	
 }
