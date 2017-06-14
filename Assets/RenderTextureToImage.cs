@@ -17,5 +17,4 @@ public class RenderTextureToImage : MonoBehaviour {
             GetComponent<RawImage>().texture = m_tex;
         }
     }
-	
 }

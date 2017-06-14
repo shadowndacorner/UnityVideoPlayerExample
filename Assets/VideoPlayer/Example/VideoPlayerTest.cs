@@ -37,6 +37,12 @@ public class VideoPlayerTest : MonoBehaviour {
         
 		GetComponent<MeshRenderer>().material.mainTexture = MovieTexture;
 
+        foreach (var v in FindObjectsOfType<RenderTextureToMainTex>())
+            v.GetComponent<MeshRenderer>().sharedMaterial = GetComponent<MeshRenderer>().sharedMaterial;
+
+        foreach (var v in FindObjectsOfType<RenderTextureToLightCookie>())
+            v.Texture = MovieTexture;
+
         player.Play();
         audioSource.Play();
 
